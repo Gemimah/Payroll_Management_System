@@ -1,0 +1,262 @@
+{
+  "info": {
+    "_postman_id": "5f5c95bb-4aa4-4e2b-a7fa-f0f1cb7f0d13",
+    "name": "Employee System API",
+    "description": "Postman collection for Employee Management, JWT auth, deductions, payroll, payslips, and approval flow.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8081" },
+    { "key": "managerToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "employeeToken", "value": "" },
+    { "key": "employeeId", "value": "1" },
+    { "key": "deductionId", "value": "1" },
+    { "key": "payrollId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "1) Auth",
+      "item": [
+        {
+          "name": "Login Manager",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.collectionVariables.set('managerToken', json.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"manager@erp.local\",\n  \"password\": \"Password@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.collectionVariables.set('adminToken', json.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin@erp.local\",\n  \"password\": \"Password@123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Employee",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.collectionVariables.set('employeeToken', json.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"employee@erp.local\",\n  \"password\": \"Password@123\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2) Employee Management",
+      "item": [
+        {
+          "name": "Create Employee (Manager)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{managerToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/employees",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Peter\",\n  \"lastName\": \"Mugabo\",\n  \"email\": \"peter.mugabo@erp.local\",\n  \"district\": \"Kigali\",\n  \"mobile\": \"0781234567\",\n  \"dateOfBirth\": \"1998-01-20\",\n  \"employeeCode\": \"EMP-0100\",\n  \"department\": \"Finance\",\n  \"position\": \"Officer\",\n  \"baseSalary\": 70000,\n  \"status\": \"ACTIVE\",\n  \"joiningDate\": \"2024-01-10\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Employees (Manager/Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": "{{baseUrl}}/api/employees"
+          }
+        },
+        {
+          "name": "Get Employee By Id (Manager/Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": "{{baseUrl}}/api/employees/{{employeeId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3) Deduction Rates",
+      "item": [
+        {
+          "name": "Get All Deduction Rates",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": "{{baseUrl}}/api/deductions"
+          }
+        },
+        {
+          "name": "Create Deduction Rate (Manager/Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{managerToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/deductions",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"BonusAllowance\",\n  \"category\": \"ALLOWANCE\",\n  \"percentage\": 2.5,\n  \"active\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Update Deduction Rate (Manager/Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{managerToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/deductions/{{deductionId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"BonusAllowance\",\n  \"category\": \"ALLOWANCE\",\n  \"percentage\": 3.0,\n  \"active\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Deduction Rate (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/api/deductions/{{deductionId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4) Payroll & Payslips",
+      "item": [
+        {
+          "name": "Process Payroll (Manager)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "  pm.collectionVariables.set('payrollId', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{managerToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/payrolls/process",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"month\": 6,\n  \"year\": 2025\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Payrolls (Manager/Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": "{{baseUrl}}/api/payrolls"
+          }
+        },
+        {
+          "name": "Get Payslips By Payroll (Manager/Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{managerToken}}" }],
+            "url": "{{baseUrl}}/api/payrolls/{{payrollId}}/payslips"
+          }
+        },
+        {
+          "name": "Get My Payslips (Employee)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{employeeToken}}" }],
+            "url": "{{baseUrl}}/api/payrolls/me/payslips"
+          }
+        },
+        {
+          "name": "Approve Payroll (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "url": "{{baseUrl}}/api/payrolls/{{payrollId}}/approve",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"institutionName\": \"RCA\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
